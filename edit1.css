@@ -44,8 +44,14 @@ html{
 body{
     font-family: var(--font-body);
     color: var(--ivory);
-    background: linear-gradient(180deg, rgba(14,19,14,.55), rgba(14,19,14,.82)), url(bg\ weeding.jpg) center top / cover no-repeat;
-    background-attachment: scroll; /* static background: avoids the iOS/Android jank & repaint cost of "fixed" */
+    background-color: var(--ink-deep);
+    background-image:
+        linear-gradient(180deg, rgba(14,19,14,.55), rgba(14,19,14,.82)),
+        url(bg\ weeding.jpg);
+    background-repeat: no-repeat, repeat;
+    background-position: top, top center;
+    background-size: 100% 100%, auto;
+    background-attachment: scroll, scroll; /* static: avoids the iOS/Android jank & repaint cost of "fixed" */
     -webkit-font-smoothing:antialiased;
 }
 
@@ -130,8 +136,7 @@ img{ max-width:100%; display:block; }
     text-align:center;
     background:
         radial-gradient(circle at 50% 20%, rgba(201,162,75,.16), transparent 55%),
-        linear-gradient(180deg, rgba(10,14,10,.72), rgba(10,14,10,.9)),
-        url(bg\ weeding.jpg) center/cover no-repeat;
+        linear-gradient(180deg, rgba(10,14,10,.78), rgba(10,14,10,.92));
     transition: opacity .9s var(--ease), visibility .9s var(--ease);
 }
 
@@ -267,7 +272,84 @@ img{ max-width:100%; display:block; }
     color:var(--ivory);
 }
 
-.open-btn-icon{ font-size:16px; }
+/* ==========================================================
+   SLIDE TO OPEN
+========================================================== */
+.slider{
+    width:100%;
+    max-width:280px;
+    margin-top:30px;
+}
+
+.slider-track{
+    position:relative;
+    height:56px;
+    border-radius:40px;
+    background:rgba(248,242,228,.08);
+    border:1px solid rgba(201,162,75,.4);
+    display:flex;
+    align-items:center;
+    padding:4px;
+    overflow:hidden;
+}
+
+.slider-fill{
+    position:absolute;
+    inset:0;
+    width:0;
+    border-radius:40px;
+    background:linear-gradient(90deg, rgba(201,162,75,.4), rgba(201,162,75,.05));
+    pointer-events:none;
+}
+
+.slider-label{
+    position:absolute;
+    left:0;
+    right:0;
+    text-align:center;
+    font-family:var(--font-utility);
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--champagne);
+    pointer-events:none;
+    animation:pulseLabel 2.4s ease-in-out infinite;
+}
+@keyframes pulseLabel{
+    0%,100%{ opacity:.5; }
+    50%{ opacity:1; }
+}
+
+.slider-thumb{
+    position:relative;
+    z-index:2;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    border:none;
+    background:var(--gold);
+    color:var(--ink-deep);
+    font-size:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:grab;
+    touch-action:none;
+    box-shadow:0 6px 16px rgba(0,0,0,.35);
+    transition:transform .05s linear, background .3s var(--ease);
+}
+.slider-thumb:active{ cursor:grabbing; }
+.slider-thumb:focus-visible{
+    outline:2px solid var(--ivory);
+    outline-offset:3px;
+}
+.slider.is-unlocked .slider-thumb{
+    background:var(--gold-deep);
+}
+.slider.is-unlocked .slider-label{
+    animation:none;
+    opacity:0;
+}
 
 /* ==========================================================
    MAIN CONTENT REVEAL
