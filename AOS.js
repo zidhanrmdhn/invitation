@@ -189,3 +189,94 @@ function openInvitation(){
 
     setTimeout(() => AOS.refresh(), 300);
 }
+
+/* ==========================================================
+   SLIDE TO OPEN
+========================================================== */
+const sliderWrap = document.getElementById("openSlider");
+const sliderTrack = sliderWrap ? sliderWrap.querySelector(".slider-track") : null;
+const sliderThumb = document.getElementById("sliderThumb");
+const sliderFill = document.getElementById("sliderFill");
+
+if (sliderWrap && sliderTrack && sliderThumb && sliderFill){
+
+    let maxX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let dragStartClientX = 0;
+    let opened = false;
+
+    function computeMaxX(){
+        maxX = sliderTrack.clientWidth - sliderThumb.offsetWidth - 8;
+    }
+
+    function setThumbX(x){
+        currentX = Math.max(0, Math.min(maxX, x));
+        sliderThumb.style.transform = `translateX(${currentX}px)`;
+        sliderFill.style.width = (currentX + sliderThumb.offsetWidth) + "px";
+        sliderWrap.classList.toggle("is-unlocked", maxX > 0 && currentX >= maxX * 0.7);
+    }
+
+    function snapBack(){
+        sliderThumb.style.transition = "transform .3s var(--ease, ease)";
+        sliderFill.style.transition = "width .3s var(--ease, ease)";
+        setThumbX(0);
+        setTimeout(() => {
+            sliderThumb.style.transition = "";
+            sliderFill.style.transition = "";
+        }, 300);
+    }
+
+    function snapOpenAndTrigger(){
+        if (opened) return;
+        opened = true;
+        sliderThumb.style.transition = "transform .25s var(--ease, ease)";
+        sliderFill.style.transition = "width .25s var(--ease, ease)";
+        setThumbX(maxX);
+        setTimeout(openInvitation, 220);
+    }
+
+    computeMaxX();
+    window.addEventListener("resize", computeMaxX);
+
+    sliderThumb.addEventListener("pointerdown", (e) => {
+        if (opened) return;
+        dragging = true;
+        dragStartClientX = e.clientX - currentX;
+        sliderThumb.style.transition = "";
+        sliderFill.style.transition = "";
+        sliderThumb.setPointerCapture(e.pointerId);
+    });
+
+    sliderThumb.addEventListener("pointermove", (e) => {
+        if (!dragging || opened) return;
+        setThumbX(e.clientX - dragStartClientX);
+    });
+
+    function endDrag(){
+        if (!dragging || opened) return;
+        dragging = false;
+        if (maxX > 0 && currentX >= maxX * 0.7){
+            snapOpenAndTrigger();
+        } else {
+            snapBack();
+        }
+    }
+
+    sliderThumb.addEventListener("pointerup", endDrag);
+    sliderThumb.addEventListener("pointercancel", endDrag);
+
+    // Simple tap/click (no drag) on the thumb also opens the invitation.
+    sliderThumb.addEventListener("click", () => {
+        if (!opened) snapOpenAndTrigger();
+    });
+
+    // Keyboard accessibility: Enter / Space / Arrow keys.
+    sliderThumb.addEventListener("keydown", (e) => {
+        if (opened) return;
+        if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight"){
+            e.preventDefault();
+            snapOpenAndTrigger();
+        }
+    });
+}
