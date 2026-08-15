@@ -40,9 +40,15 @@
                 <small>Mohon maaf apabila ada kesalahan penulisan nama.</small>
             </div>
 
-            <button type="button" class="btn open-btn" onclick="openInvitation()">
-                <span class="open-btn-icon">✉</span> Buka Undangan
-            </button>
+            <div class="slider" id="openSlider">
+                <div class="slider-track">
+                    <span class="slider-fill" id="sliderFill"></span>
+                    <span class="slider-label">Geser untuk membuka</span>
+                    <button type="button" class="slider-thumb" id="sliderThumb" aria-label="Geser untuk membuka undangan">
+                        &#10140;
+                    </button>
+                </div>
+            </div>
 
         </div>
 
