@@ -271,6 +271,54 @@ if (sliderWrap && sliderTrack && sliderThumb && sliderFill){
 
     sliderTrack.addEventListener("pointerup", finishSlide);
     sliderTrack.addEventListener("pointercancel", finishSlide);
+
+    // Fallback for older mobile browsers that do not support Pointer Events.
+    if (!("PointerEvent" in window)){
+        let activeTouchIdentifier = null;
+
+        sliderTrack.addEventListener("touchstart", (e) => {
+            if (opened || !e.changedTouches.length) return;
+            computeMaxX();
+            const touch = e.changedTouches[0];
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const thumbRect = sliderThumb.getBoundingClientRect();
+            const startedOnThumb = e.target === sliderThumb || sliderThumb.contains(e.target);
+            activeTouchIdentifier = touch.identifier;
+            activePointerId = `touch-${touch.identifier}`;
+            dragOffsetX = startedOnThumb
+                ? touch.clientX - thumbRect.left
+                : sliderThumb.offsetWidth / 2;
+            if (!startedOnThumb){
+                setThumbX(touch.clientX - trackRect.left - dragOffsetX - 4);
+            }
+            dragging = true;
+            sliderThumb.style.transition = "";
+            sliderFill.style.transition = "";
+            e.preventDefault();
+        }, { passive:false });
+
+        sliderTrack.addEventListener("touchmove", (e) => {
+            if (!dragging || activeTouchIdentifier === null) return;
+            const touch = Array.from(e.touches).find(item => item.identifier === activeTouchIdentifier);
+            if (!touch) return;
+            const trackRect = sliderTrack.getBoundingClientRect();
+            setThumbX(touch.clientX - trackRect.left - dragOffsetX - 4);
+            e.preventDefault();
+        }, { passive:false });
+
+        function finishTouch(e){
+            if (activeTouchIdentifier === null) return;
+            const ended = Array.from(e.changedTouches).some(item => item.identifier === activeTouchIdentifier);
+            if (!ended) return;
+            const pointerId = activePointerId;
+            activeTouchIdentifier = null;
+            finishSlide({ pointerId });
+        }
+
+        sliderTrack.addEventListener("touchend", finishTouch, { passive:false });
+        sliderTrack.addEventListener("touchcancel", finishTouch, { passive:false });
+    }
+
     window.addEventListener("resize", computeMaxX);
     sliderThumb.addEventListener("keydown", (e) => {
         if (!opened && ["Enter", " ", "ArrowRight"].includes(e.key)){
