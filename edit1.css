@@ -46,11 +46,10 @@ body{
     color: var(--ivory);
     background-color: var(--ink-deep);
     background-image:
-        linear-gradient(180deg, rgba(14,19,14,.55), rgba(14,19,14,.82)),
-        url(bg\ weeding.jpg);
+        linear-gradient(180deg, rgba(14, 19, 14, 0), rgba(37, 118, 155, 0)),
+        url(foto1.jpg);
     background-repeat: no-repeat, repeat;
     background-position: top, top center;
-    background-size: 100% 100%, auto;
     background-attachment: scroll, scroll; /* static: avoids the iOS/Android jank & repaint cost of "fixed" */
     -webkit-font-smoothing:antialiased;
 }
