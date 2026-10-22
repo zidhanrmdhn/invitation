@@ -49,8 +49,8 @@ body{
 }
 
 .background-slideshow{
-    position:fixed; inset:0; z-index:0; overflow:hidden;
-    background:var(--ink-deep); pointer-events:none;
+    position:fixed; top:0; left:0; width:100vw; height:100vh; height:100dvh;
+    z-index:0; overflow:hidden; background:var(--ink-deep); pointer-events:none;
 }
 .background-slideshow::after{
     content:""; position:absolute; inset:0;
@@ -69,11 +69,11 @@ body{
 @keyframes backgroundSlide{
     0%{opacity:0} 4%{opacity:1} 16%{opacity:1} 20%{opacity:0} 100%{opacity:0}
 }
-body > :not(.background-slideshow){z-index:1}
-.main-content{position:relative}
+.main-content{position:relative; z-index:1}
 body.lock-scroll{
     overflow:hidden;
     height:100vh;
+    height:100dvh;
 }
 
 img{ max-width:100%; display:block; }
@@ -305,6 +305,10 @@ img{ max-width:100%; display:block; }
     align-items:center;
     padding:4px;
     overflow:hidden;
+
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
 }
 
 .slider-fill{

@@ -191,12 +191,92 @@ function openInvitation(){
 
     setTimeout(() => { if (window.AOS) AOS.refresh(); }, 300);
 }
-
 /* ==========================================================
-   OPEN INVITATION BUTTON
+   SLIDE TO OPEN
 ========================================================== */
-const openInvitationButton = document.getElementById("openInvitationButton");
+const sliderWrap = document.getElementById("openSlider");
+const sliderTrack = sliderWrap ? sliderWrap.querySelector(".slider-track") : null;
+const sliderThumb = document.getElementById("sliderThumb");
+const sliderFill = document.getElementById("sliderFill");
 
-if (openInvitationButton){
-    openInvitationButton.addEventListener("click", openInvitation);
+if (sliderWrap && sliderTrack && sliderThumb && sliderFill){
+    let maxX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let opened = false;
+    let activePointerId = null;
+    let dragOffsetX = 0;
+
+    function setThumbX(x){
+        currentX = Math.max(0, Math.min(maxX, x));
+        sliderThumb.style.transform = `translateX(${currentX}px)`;
+        sliderFill.style.width = (currentX + sliderThumb.offsetWidth) + "px";
+        sliderWrap.classList.toggle("is-unlocked", maxX > 0 && currentX >= maxX * 0.7);
+    }
+
+    function computeMaxX(){
+        maxX = Math.max(0, sliderTrack.clientWidth - sliderThumb.offsetWidth - 8);
+        setThumbX(currentX);
+    }
+
+    function openAfterSlide(){
+        if (opened) return;
+        opened = true;
+        dragging = false;
+        sliderThumb.style.transition = "transform .25s var(--ease, ease)";
+        sliderFill.style.transition = "width .25s var(--ease, ease)";
+        setThumbX(maxX);
+        setTimeout(openInvitation, 220);
+    }
+
+    sliderTrack.addEventListener("pointerdown", (e) => {
+        if (opened || (e.button !== undefined && e.button !== 0)) return;
+        computeMaxX();
+        dragging = true;
+        activePointerId = e.pointerId;
+        const trackRect = sliderTrack.getBoundingClientRect();
+        const thumbRect = sliderThumb.getBoundingClientRect();
+        const startedOnThumb = e.target === sliderThumb || sliderThumb.contains(e.target);
+        dragOffsetX = startedOnThumb ? e.clientX - thumbRect.left : sliderThumb.offsetWidth / 2;
+        if (!startedOnThumb) setThumbX(e.clientX - trackRect.left - dragOffsetX - 4);
+        sliderThumb.style.transition = "";
+        sliderFill.style.transition = "";
+        e.preventDefault();
+        try { sliderTrack.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+
+    sliderTrack.addEventListener("pointermove", (e) => {
+        if (!dragging || e.pointerId !== activePointerId || opened) return;
+        const trackRect = sliderTrack.getBoundingClientRect();
+        setThumbX(e.clientX - trackRect.left - dragOffsetX - 4);
+        e.preventDefault();
+    });
+
+    function finishSlide(e){
+        if (!dragging || e.pointerId !== activePointerId) return;
+        dragging = false;
+        activePointerId = null;
+        if (maxX > 0 && currentX >= maxX * 0.7){
+            openAfterSlide();
+        } else {
+            sliderThumb.style.transition = "transform .3s var(--ease, ease)";
+            sliderFill.style.transition = "width .3s var(--ease, ease)";
+            setThumbX(0);
+            setTimeout(() => {
+                sliderThumb.style.transition = "";
+                sliderFill.style.transition = "";
+            }, 300);
+        }
+    }
+
+    sliderTrack.addEventListener("pointerup", finishSlide);
+    sliderTrack.addEventListener("pointercancel", finishSlide);
+    window.addEventListener("resize", computeMaxX);
+    sliderThumb.addEventListener("keydown", (e) => {
+        if (!opened && ["Enter", " ", "ArrowRight"].includes(e.key)){
+            e.preventDefault();
+            openAfterSlide();
+        }
+    });
+    requestAnimationFrame(computeMaxX);
 }
