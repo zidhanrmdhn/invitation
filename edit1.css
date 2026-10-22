@@ -907,3 +907,60 @@ img{ max-width:100%; display:block; }
     .hero-content{ padding:40px 28px; }
     .section h2{ font-size:28px; }
 }
+
+/* ==========================================================
+   FRIEND WISHES
+========================================================== */
+.wishes-section{
+    padding:90px 24px;
+    color:var(--ivory);
+    text-align:center;
+}
+.wishes-inner{max-width:620px;margin:0 auto}
+.wishes-section h2{
+    font-family:var(--font-serif);
+    font-size:36px;
+    color:var(--gold);
+}
+.wishes-intro{
+    margin:-14px auto 32px;
+    font-family:var(--font-utility);
+    font-weight:300;
+    color:var(--champagne);
+}
+.wish-form,.wish-list{
+    padding:26px;
+    text-align:left;
+    background:rgba(248,242,228,.07);
+    border:1px solid rgba(201,162,75,.28);
+    border-radius:var(--radius-lg);
+    backdrop-filter:blur(8px);
+}
+.wish-form label{
+    display:block;
+    margin:0 0 8px;
+    font-family:var(--font-utility);
+    font-size:13px;
+    color:var(--champagne);
+}
+.wish-form input,.wish-form textarea{
+    display:block;
+    width:100%;
+    margin:0 0 18px;
+    padding:13px 14px;
+    border:1px solid rgba(201,162,75,.38);
+    border-radius:var(--radius-sm);
+    background:rgba(14,19,14,.55);
+    color:var(--ivory);
+    font:300 14px/1.6 var(--font-utility);
+}
+.wish-form textarea{resize:vertical;min-height:110px}
+.wish-form input:focus,.wish-form textarea:focus{outline:2px solid var(--gold);outline-offset:2px}
+.wish-form .btn{margin-top:0}
+.wish-status{min-height:1.5em;margin-top:12px;font:300 13px var(--font-utility);color:var(--champagne)}
+.wish-list{margin-top:24px}
+.wish-list h3{margin-bottom:16px;font:600 22px var(--font-serif);color:var(--gold)}
+.wish-empty{font:300 13px/1.7 var(--font-utility);color:var(--champagne)}
+.wish-item{padding:16px 0;border-top:1px solid rgba(201,162,75,.22)}
+.wish-item strong{display:block;margin-bottom:6px;font:500 15px var(--font-utility);color:var(--gold)}
+.wish-item p{font:300 13px/1.7 var(--font-utility);color:var(--ivory);white-space:pre-wrap;overflow-wrap:anywhere}

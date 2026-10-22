@@ -325,7 +325,29 @@
             </div>
 
         </section>
+        <section class="wishes-section" id="friend-wishes">
+            <div class="wishes-inner">
+                <h2 data-aos="fade-up">Friend Wishes</h2>
+                <div class="divider" data-aos="fade-up"><span></span><i></i><span></span></div>
+                <p class="wishes-intro" data-aos="fade-up">Kirim doa dan ucapan untuk kami.</p>
 
+                <form class="wish-form" id="wishForm">
+                    <label for="wishName">Nama</label>
+                    <input id="wishName" name="name" type="text" maxlength="60" autocomplete="name" required>
+
+                    <label for="wishMessage">Pesan</label>
+                    <textarea id="wishMessage" name="message" rows="4" maxlength="500" required></textarea>
+
+                    <button class="btn" type="submit">Kirim Ucapan</button>
+                    <p class="wish-status" id="wishStatus" role="status" aria-live="polite"></p>
+                </form>
+
+                <div class="wish-list" id="wishList" aria-live="polite">
+                    <h3>Ucapan &amp; Doa</h3>
+                    <p class="wish-empty">Ucapan akan tampil di sini.</p>
+                </div>
+            </div>
+        </section>
         <footer class="footer">
             <div class="divider"><span></span><i></i><span></span></div>
             <p>Jidan &amp; Wulan &middot; 22 November 2026</p>
@@ -340,6 +362,6 @@
     <button type="button" id="musicBtn" class="music-btn" aria-label="Putar musik">🎵</button>
 
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script src="AOS.js?v=20261022"></script>
+    <script src="AOS.js?v=20261022-wishes-2"></script>
 </body>
 </html>
