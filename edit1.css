@@ -134,9 +134,9 @@ img{ max-width:100%; display:block; }
     justify-content:space-between;
     padding:48px 24px;
     text-align:center;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(201,162,75,.16), transparent 55%),
-        linear-gradient(180deg, rgba(10,14,10,.78), rgba(10,14,10,.92));
+    background-image:
+    linear-gradient(180deg, rgba(14, 19, 14, 0), rgba(37, 118, 155, 0)),
+    url(foto3.jpg);
     transition: opacity .9s var(--ease), visibility .9s var(--ease);
 }
 
