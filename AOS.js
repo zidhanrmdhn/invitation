@@ -331,7 +331,7 @@ if (sliderWrap && sliderTrack && sliderThumb && sliderFill){
 /* ==========================================================
    FRIEND WISHES API
 ========================================================== */
-const wishesApiUrl = "https://script.google.com/macros/s/AKfycbwY5DRDF3crFXx5jHY0AmTlQI7xZuwsWDNql0VuWYx797hU6Xe1XRm-daaAhI7hbKOp1g/exec"; // Add the deployed Google Apps Script Web App URL here.
+const wishesApiUrl = "https://script.google.com/macros/s/AKfycbx3EBqo8JUaNKNYE1ihdE4vOQuHxmsVTEqv-hwqOHPXN_3n-JHyihvhK00RXIBOm_3z/exec"; // Add the deployed Google Apps Script Web App URL here.
 const wishForm = document.getElementById("wishForm");
 const wishList = document.getElementById("wishList");
 const wishStatus = document.getElementById("wishStatus");
