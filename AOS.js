@@ -331,16 +331,14 @@ if (sliderWrap && sliderTrack && sliderThumb && sliderFill){
 /* ==========================================================
    FRIEND WISHES API
 ========================================================== */
-const wishesApiUrl = "https://script.google.com/macros/s/AKfycbwVSB0vXA_L8mZMI5WSPMGIpF1dIAuaGdnMPCk3zNlpCw1anrIEEYCiTiolokBqahXm/exec"; // Add the deployed Google Apps Script Web App URL here.
+const wishesApiUrl = "https://script.google.com/macros/s/AKfycbwVSB0vXA_L8mZMI5WSPMGIpF1dIAuaGdnMPCk3zNlpCw1anrIEEYCiTiolokBqahXm/exec";
 const wishForm = document.getElementById("wishForm");
 const wishList = document.getElementById("wishList");
 const wishStatus = document.getElementById("wishStatus");
 
 function renderWishes(wishes){
     if (!wishList) return;
-    while (wishList.children.length > 1){
-        wishList.removeChild(wishList.lastElementChild);
-    }
+    while (wishList.children.length > 1) wishList.removeChild(wishList.lastElementChild);
     if (!wishes.length){
         const empty = document.createElement("p");
         empty.className = "wish-empty";
@@ -360,46 +358,68 @@ function renderWishes(wishes){
     });
 }
 
-function loadFriendWishes(){
-    if (!wishesApiUrl || !wishList) return;
-    const callbackName = "receiveFriendWishes_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
-    const script = document.createElement("script");
-    const separator = wishesApiUrl.includes("?") ? "&" : "?";
-    window[callbackName] = (result) => {
-        renderWishes(result && result.wishes ? result.wishes : []);
-        delete window[callbackName];
-        script.remove();
-    };
-    script.onerror = () => {
-        wishStatus.textContent = "Ucapan belum dapat dimuat. Coba muat ulang halaman.";
-        delete window[callbackName];
-        script.remove();
-    };
-    script.src = wishesApiUrl + separator + "callback=" + encodeURIComponent(callbackName) + "&_=" + Date.now();
-    document.head.appendChild(script);
+function requestWishesApi(parameters){
+    return new Promise((resolve, reject) => {
+        const callbackName = "receiveFriendWishes_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+        const script = document.createElement("script");
+        const separator = wishesApiUrl.includes("?") ? "&" : "?";
+        const query = new URLSearchParams({ ...parameters, callback:callbackName, _:String(Date.now()) });
+        const timeout = setTimeout(() => finish(new Error("Waktu tunggu Apps Script habis.")), 12000);
+        let completed = false;
+        function finish(error, result){
+            if (completed) return;
+            completed = true;
+            clearTimeout(timeout);
+            delete window[callbackName];
+            script.remove();
+            if (error) reject(error);
+            else resolve(result);
+        }
+        window[callbackName] = (result) => {
+            if (!result || result.ok !== true) finish(new Error("Apps Script menolak permintaan."));
+            else finish(null, result);
+        };
+        script.onerror = () => finish(new Error("Apps Script tidak dapat diakses."));
+        script.src = wishesApiUrl + separator + query.toString();
+        document.head.appendChild(script);
+    });
+}
+
+async function loadFriendWishes(){
+    try{
+        const result = await requestWishesApi({ action:"list" });
+        const wishes = Array.isArray(result.wishes) ? result.wishes : [];
+        renderWishes(wishes);
+        return wishes;
+    } catch (error){
+        if (wishStatus) wishStatus.textContent = "Ucapan belum dapat dimuat. Periksa deployment Apps Script.";
+        return null;
+    }
 }
 
 if (wishForm){
     wishForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        if (!wishesApiUrl){
-            wishStatus.textContent = "Penyimpanan ucapan bersama belum dihubungkan.";
-            return;
-        }
+        if (wishForm.dataset.sending === "true") return;
         const payload = {
-            name: document.getElementById("wishName").value.trim(),
-            message: document.getElementById("wishMessage").value.trim()
+            name:document.getElementById("wishName").value.trim(),
+            message:document.getElementById("wishMessage").value.trim()
         };
         if (!payload.name || !payload.message) return;
+
+        const submitButton = wishForm.querySelector('[type="submit"]');
+        wishForm.dataset.sending = "true";
+        submitButton.disabled = true;
+        wishStatus.textContent = "Mengirim ucapan…";
 
         const frame = document.createElement("iframe");
         const frameName = "wishSubmitFrame_" + Date.now();
         frame.name = frameName;
         frame.hidden = true;
+        const frameReady = new Promise((resolve) => frame.addEventListener("load", resolve, { once:true }));
         document.body.appendChild(frame);
-        wishStatus.textContent = "Mengirim ucapan…";
+        await frameReady;
 
-        await new Promise((resolve) => frame.addEventListener("load", resolve, { once:true }));
         const transport = document.createElement("form");
         transport.method = "POST";
         transport.action = wishesApiUrl;
@@ -412,23 +432,29 @@ if (wishForm){
         transport.appendChild(field);
         document.body.appendChild(transport);
 
-        let finished = false;
-        const finish = (success) => {
-            if (finished) return;
-            finished = true;
+        let completed = false;
+        const finish = (message, resetForm) => {
+            if (completed) return;
+            completed = true;
             frame.remove();
             transport.remove();
-            if (success){
-                wishForm.reset();
-                wishStatus.textContent = "Terima kasih, ucapan Anda sudah dikirim.";
-                setTimeout(loadFriendWishes, 800);
-            } else {
-                wishStatus.textContent = "Pengiriman belum terkonfirmasi. Periksa koneksi lalu coba lagi.";
-            }
+            wishForm.dataset.sending = "false";
+            submitButton.disabled = false;
+            if (resetForm) wishForm.reset();
+            wishStatus.textContent = message;
         };
-        frame.addEventListener("load", () => finish(true), { once:true });
+
+        frame.addEventListener("load", async () => {
+            const wishes = await loadFriendWishes();
+            const wasSaved = wishes && wishes.some(wish => wish.name === payload.name && wish.message === payload.message);
+            if (wasSaved){
+                finish("Terima kasih, ucapan Anda sudah tersimpan.", true);
+            } else {
+                finish("Ucapan belum tersimpan. Pastikan doGet dan doPost sudah ada di deployment Apps Script.", false);
+            }
+        }, { once:true });
         transport.submit();
-        setTimeout(() => finish(false), 15000);
+        setTimeout(() => finish("Pengiriman belum terkonfirmasi. Periksa deployment Apps Script lalu coba lagi.", false), 20000);
     });
 }
 
