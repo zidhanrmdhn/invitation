@@ -45,16 +45,32 @@ body{
     font-family: var(--font-body);
     color: var(--ivory);
     background-color: var(--ink-deep);
-    background-image:
-        linear-gradient(180deg, rgba(14, 19, 14, 0), rgba(37, 118, 155, 0)),
-        url(foto1.jpg);
-    background-repeat: no-repeat, repeat;
-    background-size: 100% 100%, auto;
-    background-position: top, top center;
-    background-attachment: scroll, scroll; /* static: avoids the iOS/Android jank & repaint cost of "fixed" */
     -webkit-font-smoothing:antialiased;
 }
 
+.background-slideshow{
+    position:fixed; inset:0; z-index:0; overflow:hidden;
+    background:var(--ink-deep); pointer-events:none;
+}
+.background-slideshow::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(14,19,14,.34), rgba(14,19,14,.58));
+}
+.background-slideshow img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+    opacity:0; animation:backgroundSlide 36s linear infinite;
+}
+.background-slideshow img:nth-child(1){animation-delay:0s}
+.background-slideshow img:nth-child(2){animation-delay:6s}
+.background-slideshow img:nth-child(3){animation-delay:12s}
+.background-slideshow img:nth-child(4){animation-delay:18s}
+.background-slideshow img:nth-child(5){animation-delay:24s}
+.background-slideshow img:nth-child(6){animation-delay:30s}
+@keyframes backgroundSlide{
+    0%{opacity:0} 4%{opacity:1} 16%{opacity:1} 20%{opacity:0} 100%{opacity:0}
+}
+body > :not(.background-slideshow){z-index:1}
+.main-content{position:relative}
 body.lock-scroll{
     overflow:hidden;
     height:100vh;
@@ -134,9 +150,7 @@ img{ max-width:100%; display:block; }
     justify-content:space-between;
     padding:48px 24px;
     text-align:center;
-    background-image:
-    linear-gradient(180deg, rgba(14, 19, 14, 0), rgba(37, 118, 155, 0)),
-    url(foto3.jpg);
+    background:transparent;
     transition: opacity .9s var(--ease), visibility .9s var(--ease);
 }
 
@@ -527,7 +541,7 @@ img{ max-width:100%; display:block; }
 .card-photo img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
 }
 
 .card h3{
@@ -680,7 +694,7 @@ img{ max-width:100%; display:block; }
 .gallery-item img{
     width:100%;
     height:220px;
-    object-fit:cover;
+    object-fit:contain;
     transition:transform .8s cubic-bezier(.2,.8,.2,1), filter .5s ease;
 }
 .gallery-item:hover{
