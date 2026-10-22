@@ -49,6 +49,7 @@ body{
         linear-gradient(180deg, rgba(14, 19, 14, 0), rgba(37, 118, 155, 0)),
         url(foto1.jpg);
     background-repeat: no-repeat, repeat;
+    background-size: 100% 100%, auto;
     background-position: top, top center;
     background-attachment: scroll, scroll; /* static: avoids the iOS/Android jank & repaint cost of "fixed" */
     -webkit-font-smoothing:antialiased;
